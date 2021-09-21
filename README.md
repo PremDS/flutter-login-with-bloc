@@ -1,6 +1,6 @@
-# flutterbloclogin
+# Login System in Flutter with Bloc
 
-A new Flutter project.
+A basic login system in flutter. Login and lougout is implemented through BLOC pattern.
 
 ## Getting Started
 

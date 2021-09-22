@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'screens/splash_screen_page.dart';
-
+import 'package:flutterbloclogin/screens/home_page.dart';
 void main()=>runApp(const MyApp());
 
 
@@ -12,10 +10,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Login with Bloc Pattern',
+      debugShowCheckedModeBanner:false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: SplashScreenPage(),
+      home: HomePage(),
     );
   }
 }

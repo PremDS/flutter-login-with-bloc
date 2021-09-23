@@ -13,7 +13,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.purpleAccent,
-        title: Text(
+        title: const Text(
           'Hamro Learning',
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),

@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutterbloclogin/screens/register_page.dart';
+import 'package:flutterbloclogin/screens/auth/login_page.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({Key? key}) : super(key: key);
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _RegisterPageState createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   String _email = '';
   String _password = '';
+  String _name = '';
   bool isPasswordVisible = false;
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _registerKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -25,7 +26,7 @@ class _LoginPageState extends State<LoginPage> {
       body: Container(
         margin: const EdgeInsets.all(35),
         child: Form(
-          key: _formKey,
+          key: _registerKey,
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -33,7 +34,7 @@ class _LoginPageState extends State<LoginPage> {
                   height: 25,
                 ),
                 Container(
-                  height: 150,
+                  height: 130,
                   child: Image.asset(
                     'assets/images/logo.png',
                     fit: BoxFit.contain,
@@ -43,31 +44,33 @@ class _LoginPageState extends State<LoginPage> {
                   height: 15,
                 ),
                 const Text(
-                  "Bloc Login",
+                  "Create Account",
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600),
                 ),
+                const SizedBox(height: 35,),
+                _buildName(),
                 const SizedBox(
-                  height: 45,
+                  height: 30,
                 ),
                 _buildEmail(),
                 const SizedBox(
-                  height: 35,
+                  height: 30,
                 ),
                 _buildPassword(),
                 const SizedBox(
-                  height: 35,
+                  height: 30,
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    if (!_formKey.currentState!.validate()) {}
-                    _formKey.currentState!.save();
+                    if (!_registerKey.currentState!.validate()) {}
+                    _registerKey.currentState!.save();
                     print(_email);
                     print(_password);
                   },
                   child: const Padding(
                     padding:
                         EdgeInsets.symmetric(horizontal: 65.0, vertical: 15),
-                    child: Text('Login', style: TextStyle(fontSize: 16)),
+                    child: Text('Register', style: TextStyle(fontSize: 16)),
                   ),
                   style: const ButtonStyle(
                       visualDensity: VisualDensity.comfortable),
@@ -78,16 +81,13 @@ class _LoginPageState extends State<LoginPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Don\'t have account ?'),
+                    const Text('Already have account?'),
                     MaterialButton(
                       onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const RegisterPage()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> const LoginPage()));
                       },
                       child: const Text(
-                        'Register here',
+                        'Login here',
                         style: TextStyle(color: Colors.blueAccent),
                       ),
                     )
@@ -98,6 +98,39 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildName() {
+    return TextFormField(
+      keyboardType: TextInputType.name,
+      decoration: const InputDecoration(
+        border: OutlineInputBorder(),
+        labelText:'Full Name',
+        labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        prefixIcon: Icon(Icons.person),
+        hintText: 'Full Name...',
+      ),
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      validator: (String? value){
+        if(value!.isEmpty) {
+          return 'Full Name is required.';
+        }
+        if(value.length < 5) {
+          return 'Name should be more than 5 letters.';
+        }
+        if(!RegExp(r"^[a-zA-Z]+$").hasMatch(value)){
+          return 'Digits and special characters not allowed.';
+        }
+
+        return null;
+      },
+      onChanged: (value){
+        _name = value;
+      },
+      onSaved: (value){
+        _name = value!;
+      },
     );
   }
 

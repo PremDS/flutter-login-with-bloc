@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutterbloclogin/screens/login_page.dart';
+import 'package:flutterbloclogin/screens/auth/register_page.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({Key? key}) : super(key: key);
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
-  _RegisterPageState createState() => _RegisterPageState();
+  _LoginPageState createState() => _LoginPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _LoginPageState extends State<LoginPage> {
   String _email = '';
   String _password = '';
   bool isPasswordVisible = false;
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _loginKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -25,7 +25,7 @@ class _RegisterPageState extends State<RegisterPage> {
       body: Container(
         margin: const EdgeInsets.all(35),
         child: Form(
-          key: _formKey,
+          key: _loginKey,
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -43,7 +43,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   height: 15,
                 ),
                 const Text(
-                  "Create Account",
+                  "Bloc Login",
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(
@@ -59,8 +59,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    if (!_formKey.currentState!.validate()) {}
-                    _formKey.currentState!.save();
+                    if (!_loginKey.currentState!.validate()) {}
+                    _loginKey.currentState!.save();
                     print(_email);
                     print(_password);
                   },
@@ -78,13 +78,16 @@ class _RegisterPageState extends State<RegisterPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Already have account?'),
+                    const Text('Don\'t have account ?'),
                     MaterialButton(
                       onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=> const LoginPage()));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const RegisterPage()));
                       },
                       child: const Text(
-                        'Login here',
+                        'Register here',
                         style: TextStyle(color: Colors.blueAccent),
                       ),
                     )

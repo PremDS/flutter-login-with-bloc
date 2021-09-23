@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutterbloclogin/screens/auth/register_page.dart';
+import 'package:flutterbloclogin/screens/home_page.dart';
+import 'package:flutterbloclogin/services/auth.dart';
+import 'package:flutterbloclogin/utils/secure_storage.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -12,6 +16,8 @@ class _LoginPageState extends State<LoginPage> {
   String _email = '';
   String _password = '';
   bool isPasswordVisible = false;
+  bool isLoggingIn = false;
+
   final GlobalKey<FormState> _loginKey = GlobalKey<FormState>();
 
   @override
@@ -21,6 +27,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    LocalStorage.checkLogIn(context);
     return Scaffold(
       body: Container(
         margin: const EdgeInsets.all(35),
@@ -59,16 +66,25 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    if (!_loginKey.currentState!.validate()) {}
-                    _loginKey.currentState!.save();
-                    print(_email);
-                    print(_password);
+                    print('here');
+                    logIn(context);
                   },
-                  child: const Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 65.0, vertical: 15),
-                    child: Text('Login', style: TextStyle(fontSize: 16)),
-                  ),
+                  child: isLoggingIn
+                      ? const Padding(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 67, vertical: 6),
+                          child: SizedBox(
+                            // height: 35,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          ),
+                        )
+                      : const Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 65.0, vertical: 15),
+                          child: Text('Login', style: TextStyle(fontSize: 16)),
+                        ),
                   style: const ButtonStyle(
                       visualDensity: VisualDensity.comfortable),
                 ),
@@ -156,5 +172,32 @@ class _LoginPageState extends State<LoginPage> {
         _password = value;
       },
     );
+  }
+
+  logIn(BuildContext context) async {
+    if (_loginKey.currentState!.validate()) {
+      isLoggingIn = true;
+      setState(() {});
+      final res = await BaseAuthentication.loginUser(_email, _password);
+      print(res);
+      if (res['status'] == 'success') {
+        try {
+          LocalStorage.saveLoginCredentials(
+              res['access_token'], res['refresh_token']);
+          await Future.delayed(const Duration(seconds: 1));
+          isLoggingIn = false;
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const HomePage()));
+        } catch (e) {
+          isLoggingIn = false;
+        }
+      } else {
+        
+        isLoggingIn = false;
+        print('not okay');
+      }
+    } else {
+      print('invalid');
+    }
   }
 }

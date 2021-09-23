@@ -3,11 +3,11 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-
+final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
 class BaseAuthentication {
-  final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+  
   //login User function
-  Future loginUser(email, password) async {
+  static Future loginUser(email, password) async {
     const String loginBaseURL = 'https://api.ikreate.com.np/intern/login';
     const headers = <String, String>  {
       'Content-Type':'application/x-www-form-urlencoded',
@@ -36,7 +36,8 @@ class BaseAuthentication {
 
 
   // Lougt user function
-  Future logoutUser() async {
+  static Future logoutUser() async {
+    
     final String? accessToken = await secureStorage.read(key:'access-token');
     final String? refreshToken = await secureStorage.read(key:'refresh-token');
     const String logoutBaseURL = 'https://api.ikreate.com.np/intern/logout';

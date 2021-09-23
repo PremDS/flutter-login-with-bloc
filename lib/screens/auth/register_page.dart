@@ -13,6 +13,7 @@ class _RegisterPageState extends State<RegisterPage> {
   String _password = '';
   String _name = '';
   bool isPasswordVisible = false;
+  bool isRegistering = false;
   final GlobalKey<FormState> _registerKey = GlobalKey<FormState>();
 
   @override
@@ -47,7 +48,9 @@ class _RegisterPageState extends State<RegisterPage> {
                   "Create Account",
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600),
                 ),
-                const SizedBox(height: 35,),
+                const SizedBox(
+                  height: 35,
+                ),
                 _buildName(),
                 const SizedBox(
                   height: 30,
@@ -62,16 +65,17 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    if (!_registerKey.currentState!.validate()) {}
-                    _registerKey.currentState!.save();
-                    print(_email);
-                    print(_password);
+                    registerAccount(context);
+                    isRegistering = true;
                   },
-                  child: const Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 65.0, vertical: 15),
-                    child: Text('Register', style: TextStyle(fontSize: 16)),
-                  ),
+                  child: isRegistering
+                      ? SizedBox(height: 35,child: CircularProgressIndicator(color:Colors.white),)
+                      : const Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 65.0, vertical: 15),
+                          child:
+                              Text('Register', style: TextStyle(fontSize: 16)),
+                        ),
                   style: const ButtonStyle(
                       visualDensity: VisualDensity.comfortable),
                 ),
@@ -84,7 +88,10 @@ class _RegisterPageState extends State<RegisterPage> {
                     const Text('Already have account?'),
                     MaterialButton(
                       onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=> const LoginPage()));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const LoginPage()));
                       },
                       child: const Text(
                         'Login here',
@@ -106,29 +113,29 @@ class _RegisterPageState extends State<RegisterPage> {
       keyboardType: TextInputType.name,
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
-        labelText:'Full Name',
+        labelText: 'Full Name',
         labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         prefixIcon: Icon(Icons.person),
         hintText: 'Full Name...',
       ),
       autovalidateMode: AutovalidateMode.onUserInteraction,
-      validator: (String? value){
-        if(value!.isEmpty) {
+      validator: (String? value) {
+        if (value!.isEmpty) {
           return 'Full Name is required.';
         }
-        if(value.length < 5) {
+        if (value.length < 5) {
           return 'Name should be more than 5 letters.';
         }
-        if(!RegExp(r"^[a-zA-Z]+$").hasMatch(value)){
+        if (!RegExp(r"^[a-zA-Z]+$").hasMatch(value)) {
           return 'Digits and special characters not allowed.';
         }
 
         return null;
       },
-      onChanged: (value){
+      onChanged: (value) {
         _name = value;
       },
-      onSaved: (value){
+      onSaved: (value) {
         _name = value!;
       },
     );
@@ -180,6 +187,9 @@ class _RegisterPageState extends State<RegisterPage> {
         if (value!.isEmpty) {
           return 'Password is required';
         }
+        if (value.length < 6) {
+          return 'Password length should be more than 6 letters.';
+        }
         return null;
       },
       onSaved: (value) {
@@ -190,4 +200,6 @@ class _RegisterPageState extends State<RegisterPage> {
       },
     );
   }
+
+  registerAccount(BuildContext context) {}
 }

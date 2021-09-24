@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterbloclogin/screens/auth/login_page.dart';
+import 'package:flutterbloclogin/screens/home_page.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -201,5 +202,14 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  registerAccount(BuildContext context) {}
+  registerAccount(BuildContext context) async {
+    if(_registerKey.currentState!.validate()) {
+      isRegistering = true;
+      setState(() {});
+      await Future.delayed(const Duration(seconds: 2));
+      Navigator.push(context, MaterialPageRoute(builder: (context)=>const HomePage()));
+
+
+    }
+  }
 }

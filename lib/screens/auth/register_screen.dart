@@ -1,24 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutterbloclogin/screens/auth/register_page.dart';
+import 'package:flutterbloclogin/screens/auth/login_page.dart';
 import 'package:flutterbloclogin/screens/home_page.dart';
-import 'package:flutterbloclogin/services/auth.dart';
-import 'package:flutterbloclogin/utils/secure_storage.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({Key? key}) : super(key: key);
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _RegisterPageState createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   String _email = '';
   String _password = '';
+  String _name = '';
   bool isPasswordVisible = false;
-  bool isLoggingIn = false;
-
-  final GlobalKey<FormState> _loginKey = GlobalKey<FormState>();
+  bool isRegistering = false;
+  final GlobalKey<FormState> _registerKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -27,12 +24,11 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    LocalStorage.checkLogIn(context);
     return Scaffold(
       body: Container(
         margin: const EdgeInsets.all(35),
         child: Form(
-          key: _loginKey,
+          key: _registerKey,
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -40,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
                   height: 25,
                 ),
                 Container(
-                  height: 150,
+                  height: 130,
                   child: Image.asset(
                     'assets/images/logo.png',
                     fit: BoxFit.contain,
@@ -50,40 +46,36 @@ class _LoginPageState extends State<LoginPage> {
                   height: 15,
                 ),
                 const Text(
-                  "Bloc Login",
+                  "Create Account",
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(
-                  height: 45,
+                  height: 35,
+                ),
+                _buildName(),
+                const SizedBox(
+                  height: 30,
                 ),
                 _buildEmail(),
                 const SizedBox(
-                  height: 35,
+                  height: 30,
                 ),
                 _buildPassword(),
                 const SizedBox(
-                  height: 35,
+                  height: 30,
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    print('here');
-                    logIn(context);
+                    registerAccount(context);
+                    isRegistering = true;
                   },
-                  child: isLoggingIn
-                      ? const Padding(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 67, vertical: 6),
-                          child: SizedBox(
-                            // height: 35,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                            ),
-                          ),
-                        )
+                  child: isRegistering
+                      ? SizedBox(height: 35,child: CircularProgressIndicator(color:Colors.white),)
                       : const Padding(
                           padding: EdgeInsets.symmetric(
                               horizontal: 65.0, vertical: 15),
-                          child: Text('Login', style: TextStyle(fontSize: 16)),
+                          child:
+                              Text('Register', style: TextStyle(fontSize: 16)),
                         ),
                   style: const ButtonStyle(
                       visualDensity: VisualDensity.comfortable),
@@ -94,16 +86,16 @@ class _LoginPageState extends State<LoginPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Don\'t have account ?'),
+                    const Text('Already have account?'),
                     MaterialButton(
                       onPressed: () {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const RegisterPage()));
+                                builder: (context) => const LoginScreen()));
                       },
                       child: const Text(
-                        'Register here',
+                        'Login here',
                         style: TextStyle(color: Colors.blueAccent),
                       ),
                     )
@@ -114,6 +106,39 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildName() {
+    return TextFormField(
+      keyboardType: TextInputType.name,
+      decoration: const InputDecoration(
+        border: OutlineInputBorder(),
+        labelText: 'Full Name',
+        labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        prefixIcon: Icon(Icons.person),
+        hintText: 'Full Name...',
+      ),
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      validator: (String? value) {
+        if (value!.isEmpty) {
+          return 'Full Name is required.';
+        }
+        if (value.length < 5) {
+          return 'Name should be more than 5 letters.';
+        }
+        if (!RegExp(r"^[a-zA-Z]+$").hasMatch(value)) {
+          return 'Digits and special characters not allowed.';
+        }
+
+        return null;
+      },
+      onChanged: (value) {
+        _name = value;
+      },
+      onSaved: (value) {
+        _name = value!;
+      },
     );
   }
 
@@ -163,6 +188,9 @@ class _LoginPageState extends State<LoginPage> {
         if (value!.isEmpty) {
           return 'Password is required';
         }
+        if (value.length < 6) {
+          return 'Password length should be more than 6 letters.';
+        }
         return null;
       },
       onSaved: (value) {
@@ -174,30 +202,14 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  logIn(BuildContext context) async {
-    if (_loginKey.currentState!.validate()) {
-      isLoggingIn = true;
+  registerAccount(BuildContext context) async {
+    if(_registerKey.currentState!.validate()) {
+      isRegistering = true;
       setState(() {});
-      final res = await BaseAuthentication.loginUser(_email, _password);
-      print(res);
-      if (res['status'] == 'success') {
-        try {
-          LocalStorage.saveLoginCredentials(
-              res['access_token'], res['refresh_token']);
-          await Future.delayed(const Duration(seconds: 1));
-          isLoggingIn = false;
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const HomePage()));
-        } catch (e) {
-          isLoggingIn = false;
-        }
-      } else {
-        
-        isLoggingIn = false;
-        print('not okay');
-      }
-    } else {
-      print('invalid');
+      await Future.delayed(const Duration(seconds: 2));
+      Navigator.push(context, MaterialPageRoute(builder: (context)=>const HomePage()));
+
+
     }
   }
 }

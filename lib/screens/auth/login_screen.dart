@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:flutterbloclogin/screens/auth/login_page.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutterbloclogin/screens/auth/register_page.dart';
 import 'package:flutterbloclogin/screens/home_page.dart';
+import 'package:flutterbloclogin/services/auth.dart';
+import 'package:flutterbloclogin/utils/secure_storage.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({Key? key}) : super(key: key);
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  _RegisterPageState createState() => _RegisterPageState();
+  _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _LoginScreenState extends State<LoginScreen> {
   String _email = '';
   String _password = '';
-  String _name = '';
   bool isPasswordVisible = false;
-  bool isRegistering = false;
-  final GlobalKey<FormState> _registerKey = GlobalKey<FormState>();
+  bool isLoggingIn = false;
+
+  final GlobalKey<FormState> _loginKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -24,11 +27,12 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    LocalStorage.checkLogIn();
     return Scaffold(
       body: Container(
         margin: const EdgeInsets.all(35),
         child: Form(
-          key: _registerKey,
+          key: _loginKey,
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -36,7 +40,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   height: 25,
                 ),
                 Container(
-                  height: 130,
+                  height: 150,
                   child: Image.asset(
                     'assets/images/logo.png',
                     fit: BoxFit.contain,
@@ -46,36 +50,40 @@ class _RegisterPageState extends State<RegisterPage> {
                   height: 15,
                 ),
                 const Text(
-                  "Create Account",
+                  "Bloc Login",
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(
-                  height: 35,
-                ),
-                _buildName(),
-                const SizedBox(
-                  height: 30,
+                  height: 45,
                 ),
                 _buildEmail(),
                 const SizedBox(
-                  height: 30,
+                  height: 35,
                 ),
                 _buildPassword(),
                 const SizedBox(
-                  height: 30,
+                  height: 35,
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    registerAccount(context);
-                    isRegistering = true;
+                    print('here');
+                    logIn(context);
                   },
-                  child: isRegistering
-                      ? SizedBox(height: 35,child: CircularProgressIndicator(color:Colors.white),)
+                  child: isLoggingIn
+                      ? const Padding(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 67, vertical: 6),
+                          child: SizedBox(
+                            // height: 35,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          ),
+                        )
                       : const Padding(
                           padding: EdgeInsets.symmetric(
                               horizontal: 65.0, vertical: 15),
-                          child:
-                              Text('Register', style: TextStyle(fontSize: 16)),
+                          child: Text('Login', style: TextStyle(fontSize: 16)),
                         ),
                   style: const ButtonStyle(
                       visualDensity: VisualDensity.comfortable),
@@ -86,16 +94,16 @@ class _RegisterPageState extends State<RegisterPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Already have account?'),
+                    const Text('Don\'t have account ?'),
                     MaterialButton(
                       onPressed: () {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const LoginPage()));
+                                builder: (context) => const RegisterPage()));
                       },
                       child: const Text(
-                        'Login here',
+                        'Register here',
                         style: TextStyle(color: Colors.blueAccent),
                       ),
                     )
@@ -106,39 +114,6 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildName() {
-    return TextFormField(
-      keyboardType: TextInputType.name,
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        labelText: 'Full Name',
-        labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        prefixIcon: Icon(Icons.person),
-        hintText: 'Full Name...',
-      ),
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      validator: (String? value) {
-        if (value!.isEmpty) {
-          return 'Full Name is required.';
-        }
-        if (value.length < 5) {
-          return 'Name should be more than 5 letters.';
-        }
-        if (!RegExp(r"^[a-zA-Z]+$").hasMatch(value)) {
-          return 'Digits and special characters not allowed.';
-        }
-
-        return null;
-      },
-      onChanged: (value) {
-        _name = value;
-      },
-      onSaved: (value) {
-        _name = value!;
-      },
     );
   }
 
@@ -188,9 +163,6 @@ class _RegisterPageState extends State<RegisterPage> {
         if (value!.isEmpty) {
           return 'Password is required';
         }
-        if (value.length < 6) {
-          return 'Password length should be more than 6 letters.';
-        }
         return null;
       },
       onSaved: (value) {
@@ -202,14 +174,29 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  registerAccount(BuildContext context) async {
-    if(_registerKey.currentState!.validate()) {
-      isRegistering = true;
+  logIn(BuildContext context) async {
+    if (_loginKey.currentState!.validate()) {
+      isLoggingIn = true;
       setState(() {});
-      await Future.delayed(const Duration(seconds: 2));
-      Navigator.push(context, MaterialPageRoute(builder: (context)=>const HomePage()));
-
-
+      BaseAuthentication baseAuthentication = BaseAuthentication();
+      final res = await baseAuthentication.loginUser(_email, _password);
+      print(res);
+      if (res['status'] == 'success') {
+        try {
+          LocalStorage.saveLoginCredentials(res['access_token']);
+          await Future.delayed(const Duration(seconds: 1));
+          isLoggingIn = false;
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const HomePage()));
+        } catch (e) {
+          isLoggingIn = false;
+        }
+      } else {
+        isLoggingIn = false;
+        print('not okay');
+      }
+    } else {
+      print('invalid');
     }
   }
 }

@@ -7,7 +7,7 @@ final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
 class BaseAuthentication {
   
   //login User function
-  static Future loginUser(email, password) async {
+  Future loginUser(email, password) async {
     const String loginBaseURL = 'https://api.ikreate.com.np/intern/login';
     const headers = <String, String>  {
       'Content-Type':'application/x-www-form-urlencoded',
@@ -36,7 +36,7 @@ class BaseAuthentication {
 
 
   // Lougt user function
-  static Future logoutUser() async {
+  Future logoutUser() async {
     
     final String? accessToken = await secureStorage.read(key:'access-token');
     final String? refreshToken = await secureStorage.read(key:'refresh-token');

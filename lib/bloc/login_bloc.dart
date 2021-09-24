@@ -15,6 +15,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   @override
   Stream<LoginState> mapEventToState(LoginEvent event) async* {
     if (event is AppLoadEvent) {
+      print('Appload event');
       yield LoginLoadingState();
       bool isUserLoggedIn = await LocalStorage.checkLogIn();
       try {

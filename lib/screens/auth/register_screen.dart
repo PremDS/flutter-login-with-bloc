@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutterbloclogin/screens/auth/login_page.dart';
-import 'package:flutterbloclogin/screens/home_page.dart';
+import 'package:flutterbloclogin/screens/auth/login_screen.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({Key? key}) : super(key: key);
+import '../home_screen.dart';
+
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({Key? key}) : super(key: key);
 
   @override
-  _RegisterPageState createState() => _RegisterPageState();
+  _RegisterScreenState createState() => _RegisterScreenState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterScreenState extends State<RegisterScreen> {
   String _email = '';
   String _password = '';
   String _name = '';
@@ -92,7 +93,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const LoginScreen()));
+                                builder: (context) => LoginScreen()));
                       },
                       child: const Text(
                         'Login here',
@@ -207,7 +208,7 @@ class _RegisterPageState extends State<RegisterPage> {
       isRegistering = true;
       setState(() {});
       await Future.delayed(const Duration(seconds: 2));
-      Navigator.push(context, MaterialPageRoute(builder: (context)=>const HomePage()));
+      Navigator.push(context, MaterialPageRoute(builder: (context)=>const HomeScreen()));
 
 
     }

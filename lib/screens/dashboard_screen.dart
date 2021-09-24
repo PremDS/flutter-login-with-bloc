@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutterbloclogin/model/user_profile.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+class DashboardScreen extends StatefulWidget {
+  UserProfile  userProfile;
+  DashboardScreen({Key? key, required this.userProfile}) : super(key: key);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _DashboardScreenState createState() => _DashboardScreenState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     Navigator.of(context).pop();

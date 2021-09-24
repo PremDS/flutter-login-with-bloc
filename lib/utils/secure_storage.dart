@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutterbloclogin/screens/auth/login_page.dart';
-import 'package:flutterbloclogin/screens/home_page.dart';
+import 'package:flutterbloclogin/screens/home_screen.dart';
 
 final FlutterSecureStorage secureStorage = FlutterSecureStorage();
 

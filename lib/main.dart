@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutterbloclogin/screens/home_page.dart';
+import 'package:flutterbloclogin/screens/home_screen.dart';
 import 'package:flutterbloclogin/screens/auth/login_screen.dart';
 import 'package:flutterbloclogin/utils/secure_storage.dart';
 
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: LoginScreen(),
+      home: const HomeScreen(),
     );
   }
 }
